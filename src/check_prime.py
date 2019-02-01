@@ -1,5 +1,8 @@
 # Python program to check if the input number is prime or not
 import random
+
+
+
 def check(p):
     if p > 1:
         return miller_rabin(p, 40)
@@ -35,6 +38,7 @@ def check_safe(p):
     return check(n)
 
 def miller_rabin(n, k):
+    # Primality test courtesy of Ayrx on Github:
     # https://gist.github.com/Ayrx/5884790
     # Implementation uses the Miller-Rabin Primality Test
     # The optimal number of rounds for this test is 40
