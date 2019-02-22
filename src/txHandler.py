@@ -73,17 +73,31 @@ class txHandler():
             #print("out",txOutSum)
         return (txInSum >= txOutSum)
     @staticmethod
-
-    def handleTxs(possibleTxs):  # Transaction[] --> Transaction[]
-
-        for tx in possibleTxs:
-            if not txHandler.isValidTx(tx):
-                pass #if any transactiona are invalid, just ignore them or return None
-
-    #* Handles each epoch by receiving a set of proposed
-    #* transactions, checking each transaction for correctness using isValidTx(),
-    #* returning a mutually valid array of accepted transactions.
-    #* handleTxs() should return a mutually valid transaction set of maximal size ---
-    #* one that can’t be enlarged simply by adding more transactions.
-
-        pass
+    # * Handles each epoch by receiving a set of proposed
+    # * transactions, checking each transaction for correctness using isValidTx(),
+    # * returning a mutually valid array of accepted transactions.
+    # * handleTxs() should return a mutually valid transaction set of maximal size ---
+    # * one that can’t be enlarged simply by adding more transactions.
+    @staticmethod
+    def handleTxs(possibleTxs, utxoPool, pksList):  # Transaction[] --> Transaction[]
+        validTransactions = []
+        inputTracker = set()
+        for txInd in possibleTxs:
+            transactionInputTracker = set()  # Seperate in case the transaction is invalid
+            if txHandler.isValidTx(possibleTxs[txInd], utxoPool, pksList[txInd]):
+                invalidInputFound = False
+                for txInputInd in range(0, possibleTxs[txInputInd].getInputLen()):
+                    txIn = possibleTxs[txInputInd].getInput(txInputInd)
+                    prevTxOut = utxoPool.search(txIn.prevTxHash, txIn.outputIndex)
+                    if prevTxOut is None:
+                        invalidInputFound = True
+                        break
+                    if (txIn.prevTxHash, txIn.signature) in inputTracker:
+                        invalidInputFound = True
+                        break
+                    else:
+                        transactionInputTracker.add((txIn.prevTxHash, txIn.signature))
+            if not invalidInputFound:
+                inputTracker = inputTracker.union(transactionInputTracker)
+                validTransactions.append(possibleTxs[txInd])
+        return validTransactions
