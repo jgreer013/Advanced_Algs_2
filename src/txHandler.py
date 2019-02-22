@@ -17,9 +17,7 @@ class txHandler():
         for txInputInd in range(0,tx.getOutputLen()):
             txOut = tx.getOutput(txInputInd)
             txOutValue = txOut.value
-            print(txOutValue)
             if txOutValue is None and not utxoPool.contains(txOutValue) and txOutValue < 0:
-                #print("False line 1")
                 return False
             else:
                 txOutSum+=txOutValue
@@ -34,14 +32,8 @@ class txHandler():
             txIn = tx.getInput(txInputInd)
             prevTxOut = utxoPool.search(txIn.prevTxHash,txIn.outputIndex)
             if prevTxOut is None:
-                #print("False line 2")
                 return False
-            #prevTxOut = prevTx.getOutput(txIn.outputIndex)
-            #TODO: Fails here on some tests but test one doesn't prevent multiple of the same input
             if (txIn.prevTxHash,txIn.signature) in inputTracker:
-                #print("False line 3")
-                #print("hash",txIn.prevTxHash,"outindex",txIn.outputIndex,"sig",txIn.signature)
-                #print(inputTracker)
                 return False
             else:
                 inputTracker.add((txIn.prevTxHash,txIn.signature))
@@ -51,26 +43,13 @@ class txHandler():
             m.update(str.encode(verifyTransaction.getRawDataToSign(txInputInd)))
             hm = int(m.hexdigest(), 16)
             #HM is same, pk is correct as it is passed in so signatures should match
-            #TODO: public key matches with secret key and so does the message but cannot verify
-            #print("isValid Output")
-            #print(txInputInd)
-            #print("pk", pks[txInputInd])
-            #print("hm", hm)
-            #print("printsig-nocalc", txIn.signature)
             if not verify(pks[txInputInd],txIn.signature,hm):
-                #print("False line 4")
                 return False
 
-
             if prevTxOut.value is None or prevTxOut.value < 0:
-                #print("False line 5")
                 return False
             else:
                 txInSum += prevTxOut.value
-        #if not (txInSum >= txOutSum):
-            #print("False line 6")
-            #print("in:",txInSum)
-            #print("out",txOutSum)
         return (txInSum >= txOutSum)
     @staticmethod
     # * Handles each epoch by receiving a set of proposed

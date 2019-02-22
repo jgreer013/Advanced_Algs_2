@@ -92,22 +92,10 @@ class TestMethods(unittest.TestCase):
                      uncorrupted = False
                  keyPair = utxoToKeyPair[utxoAtIndex[j]]
                  tx.addSignature(sign(keyPair[0], hm), j)
-                 #print("Test output")
-                 #print(j)
-                 #print("sk", utxoToKeyPair[utxoAtIndex[j]][0])
-                 #print("pk", utxoToKeyPair[utxoAtIndex[j]][1])
-                 #print("hm", hm)
-                 #print("sig", tx.getInput(j).signature)
                  pks.append(utxoToKeyPair[utxoAtIndex[j]][1])
            tx.finalize()
            if (txHandler.isValidTx(tx,utxoPool,pks) != uncorrupted):
                passes = False
-               #print("Failed")
-               #txHandler.isValidTx(tx, utxoPool,pks)
-               break
-           else:
-               pass
-               #print("Passed")
         self.assertTrue(passes)
 
 

@@ -34,7 +34,6 @@ class TestMethods(unittest.TestCase):
            for j in range(num):
               # pick a random public address
               rIndex = random.randint(0,len(people)-1)
-              #print("Index",rIndex); print(people[rIndex])
               addr = people[rIndex][1]  #(sk,pk)
               value = random.random() * maxValue
               tx.addOutput(value, addr);
@@ -91,7 +90,6 @@ class TestMethods(unittest.TestCase):
 
                  keyPair = utxoToKeyPair[utxoAtIndex[j]]
                  if (random.random() < pCorrupt):
-                   print("Corrupted")
                    randomKeyPair = random.randint(0,nPeople-1)
                    while people[randomKeyPair] == keyPair:
                        randomKeyPair = random.randint(0, nPeople - 1)

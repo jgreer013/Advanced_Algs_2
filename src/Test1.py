@@ -103,25 +103,12 @@ class TestMethods(unittest.TestCase):
            for j in range(nInput):
              m=hashlib.sha256()
              m.update(str.encode(tx.getRawDataToSign(j)))
-             #print("Message")
-             #print(str.encode(tx.getRawDataToSign(j)))
              hm = int(m.hexdigest(),16)
              tx.addSignature(sign(utxoToKeyPair[utxoAtIndex[j]][0], hm), j)
-             #print(j)
-             #print("sk",utxoToKeyPair[utxoAtIndex[j]][0])
-             #print("pk",utxoToKeyPair[utxoAtIndex[j]][1])
-             #print("hm",hm)
-             #print("sig",tx.getInput(j).signature)
              pks.append(utxoToKeyPair[utxoAtIndex[j]][1])
            tx.finalize()
            if (not txHandler.isValidTx(tx,utxoPool,pks)):
                passes = False
-               #print("TEST NUMBERRRRRRRRRRRRRRRRRR",i,"Failed")
-               break
-           else:
-               #print("TEST NUMBERRRRRRRRRRRRRRRRRR",i,"Passed HERE")
-               pass
-           #print("\n\n\n")
         self.assertTrue(passes)
 
 
