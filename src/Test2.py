@@ -53,7 +53,7 @@ class TestMethods(unittest.TestCase):
         maxValidInput = 2
         maxOutput = 3
         passes = True
-
+        pks = []
         for i in range(nTxPerTest):         
            tx = Transaction()
            uncorrupted = True
@@ -86,11 +86,20 @@ class TestMethods(unittest.TestCase):
                      uncorrupted = False
                  keyPair = utxoToKeyPair[utxoAtIndex[j]]
                  tx.addSignature(sign(keyPair[0], hm,p,g), j)
-         
+                 print(j)
+                 print("sk", utxoToKeyPair[utxoAtIndex[j]][0])
+                 print("pk", utxoToKeyPair[utxoAtIndex[j]][1])
+                 print("hm", hm)
+                 print("sig", tx.getInput(j).signature)
+                 pks.append(utxoToKeyPair[utxoAtIndex[j]][1])
            tx.finalize()
-           if (txHandler.isValidTx(tx,utxoPool) != uncorrupted):
-             passes = False
-             txHandler.isValidTx(tx, utxoPool)
+           if (txHandler.isValidTx(tx,utxoPool,pks) != uncorrupted):
+               passes = False
+               print("Failed")
+               #txHandler.isValidTx(tx, utxoPool,pks)
+               break
+           else:
+               print("Passed")
         self.assertTrue(passes)
 
 
