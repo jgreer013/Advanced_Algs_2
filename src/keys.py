@@ -1,18 +1,4 @@
-"""
-def genkeys(n,p,g):
-    sk=random.getrandbits(n)
-    pk= #ToDo
-    return sk, pk
-    
-
-def sign(sk,msg,p,g):
-    return #ToDo
-
-def verify(pk,sig,msg,p,g):
-    return #ToDo
-"""
 import random
-
 p = 2**513 + 83049
 g = 2
 n = 513

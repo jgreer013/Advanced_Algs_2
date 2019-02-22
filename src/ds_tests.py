@@ -1,4 +1,4 @@
-from dig_sig import *
+from keys import *
 import hashlib
 import time
 

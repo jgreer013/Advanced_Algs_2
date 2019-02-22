@@ -28,8 +28,17 @@ class UTXO():
                 return False
         
         return True
-    
 
+    def equals(self,othertxHash,otherIndex):
+        if (othertxHash is  None or otherIndex is None):
+            return False
+        if (len(othertxHash) != len(self.txHash) or self.index != otherIndex):
+            return False
+        for i in range(len(othertxHash)):
+            if (othertxHash[i] != self.txHash[i]):
+                return False
+
+        return True
     def compareTo(self,utxo):
         hash = utxo.txHash
         ind = utxo.index

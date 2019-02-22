@@ -1,3 +1,4 @@
+from UTXO import UTXO
 
 class UTXOPool():
 
@@ -27,3 +28,9 @@ class UTXOPool():
         for ut in setUTXO:
             allUTXO.append(ut)
         return allUTXO
+
+    def search(self,txHash,index):
+        for ut in self.H.keys():
+            if ut.equals(txHash,index):
+                return self.H[ut]
+        return None

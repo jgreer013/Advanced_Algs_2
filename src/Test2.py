@@ -5,7 +5,7 @@ from Transaction import Transaction
 from UTXOPool import UTXOPool
 from UTXO import UTXO
 from keys import genkeys, sign, verify, n, g, p
-
+from txHandler import txHandler
 
 class TestMethods(unittest.TestCase):
  
@@ -88,8 +88,9 @@ class TestMethods(unittest.TestCase):
                  tx.addSignature(sign(keyPair[0], hm,p,g), j)
          
            tx.finalize()
-           if (txHandler.isValidTx(tx) != uncorrupted):
+           if (txHandler.isValidTx(tx,utxoPool) != uncorrupted):
              passes = False
+             txHandler.isValidTx(tx, utxoPool)
         self.assertTrue(passes)
 
 
