@@ -7,7 +7,7 @@ n = 513
 def genkeys(n=n,p=p,g=g):
     sk = random.getrandbits(n)
     pk = pow(g,sk,p)
-    return pk, sk
+    return sk , pk
 
 def sign(sk,msg,p=p,g=g):
     return pow(g, (msg - sk) % (p-1), p)

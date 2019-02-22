@@ -49,19 +49,25 @@ class TestMethods(unittest.TestCase):
         print("Len of utxoSet", len(utxoSet))
         maxValidInput = min(maxInput, len(utxoSet))
 
-        nTxPerTest= 11
+        nTxPerTest= 1000
         maxValidInput = 2
         maxOutput = 3
         passes = True
-        pks = []
-        for i in range(nTxPerTest):         
+
+        for i in range(nTxPerTest):
+           pks = []
+           usedInputs = set()
            tx = Transaction()
+
            uncorrupted = True
            utxoAtIndex = {}
            nInput = random.randint(1,maxValidInput+ 1)
            inputValue = 0.0
            for j in range(nInput):
-              utxo = random.sample(utxoSet,1)[0]
+              utxo = random.sample(utxoSet, 1)[0]
+              while ((utxo.getTxHash(), utxo.getIndex()) in usedInputs):
+                  utxo = random.sample(utxoSet, 1)[0]
+              usedInputs.add((utxo.getTxHash(), utxo.getIndex()))
               tx.addInput(utxo.getTxHash(), utxo.getIndex())
               inputValue += utxoPool.getTxOutput(utxo).value
               utxoAtIndex[j] = utxo
@@ -85,7 +91,8 @@ class TestMethods(unittest.TestCase):
                      hm += 1
                      uncorrupted = False
                  keyPair = utxoToKeyPair[utxoAtIndex[j]]
-                 tx.addSignature(sign(keyPair[0], hm,p,g), j)
+                 tx.addSignature(sign(keyPair[0], hm), j)
+                 print("Test output")
                  print(j)
                  print("sk", utxoToKeyPair[utxoAtIndex[j]][0])
                  print("pk", utxoToKeyPair[utxoAtIndex[j]][1])

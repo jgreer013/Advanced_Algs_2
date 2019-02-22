@@ -4,7 +4,7 @@ import random
 from Transaction import Transaction
 from UTXOPool import UTXOPool
 from UTXO import UTXO
-from keys import genkeys, sign, verify, n, g, p
+from keys import genkeys, sign, verify
 from txHandler import txHandler
 
 class TestMethods(unittest.TestCase):
@@ -15,21 +15,24 @@ class TestMethods(unittest.TestCase):
         self.assertFalse('Foo'.isupper())
  
     def test_keysigs(self):
-        m = hashlib.sha256()
-        m.update(b"Nobody respects")
-        m.update(b" the spammish repetition")
-        skx, pkx = genkeys(n,p,g)
-        hm=int(m.hexdigest(),16)
-        sig= sign(skx,hm,p,g)
-        self.assertTrue(verify(pkx,sig,hm,p,g))
-        self.assertFalse(verify(pkx,sig,hm+1,p,g))
-        print("PASSED KEYSIGSSS")
+        msg = [b"4194909766994028808293623689273419362309706882612353484933795166041013714163",
+               b"81514427175971543293164191618001506196838267623329851389681647701779330840600",
+               b"17252908227080267616614312042183132638406086197574336239937230109815325852588"]
+        for i in range(len(msg)):
+            m = hashlib.sha256()
+            m.update(msg[i])
+            skx, pkx = genkeys()
+            hm=int(m.hexdigest(),16)
+            sig= sign(skx,hm)
+            self.assertTrue(verify(pkx,sig,hm))
+            self.assertFalse(verify(pkx,sig,hm+1))
+        #print("PASSED KEYSIGSSS")
     def test_1(self):
         print("Test 1: test isValidTx() with valid transactions")
         nPeople = 10
         people = [] #new List DigSigKeyPair
         for i in range(nPeople):
-           sk,pk = genkeys(n,p,g)
+           sk,pk = genkeys()
            people.append((sk,pk))
         
 # Create a pool and an index into key pairs
@@ -64,19 +67,26 @@ class TestMethods(unittest.TestCase):
         print("Len of utxoSet", len(utxoSet))
         maxValidInput = min(maxInput, len(utxoSet))
 
-        nTxPerTest= 11
+        nTxPerTest= 1000
         maxValidInput = 2
         maxOutput = 3
         passes = True
-        pks=[]
-        for i in range(nTxPerTest):         
+
+        for i in range(nTxPerTest):
+           pks = []
+           usedInputs = set()
            tx = Transaction()
            utxoAtIndex = {}
            nInput = random.randint(1,maxValidInput+ 1)
            inputValue = 0.0
+
            for j in range(nInput):
-              utxo = random.sample(utxoSet,1)[0]
+              utxo = random.sample(utxoSet, 1)[0]
+              while ((utxo.getTxHash(),utxo.getIndex()) in usedInputs):
+                utxo = random.sample(utxoSet, 1)[0]
               tx.addInput(utxo.getTxHash(), utxo.getIndex())
+              usedInputs.add((utxo.getTxHash(),utxo.getIndex()))
+
               inputValue += utxoPool.getTxOutput(utxo).value
               utxoAtIndex[j] = utxo
            nOutput = random.randint(1,maxOutput)
@@ -93,21 +103,25 @@ class TestMethods(unittest.TestCase):
            for j in range(nInput):
              m=hashlib.sha256()
              m.update(str.encode(tx.getRawDataToSign(j)))
+             #print("Message")
+             #print(str.encode(tx.getRawDataToSign(j)))
              hm = int(m.hexdigest(),16)
              tx.addSignature(sign(utxoToKeyPair[utxoAtIndex[j]][0], hm), j)
-             print(j)
-             print("sk",utxoToKeyPair[utxoAtIndex[j]][0])
-             print("pk",utxoToKeyPair[utxoAtIndex[j]][1])
-             print("hm",hm)
-             print("sig",tx.getInput(j).signature)
+             #print(j)
+             #print("sk",utxoToKeyPair[utxoAtIndex[j]][0])
+             #print("pk",utxoToKeyPair[utxoAtIndex[j]][1])
+             #print("hm",hm)
+             #print("sig",tx.getInput(j).signature)
              pks.append(utxoToKeyPair[utxoAtIndex[j]][1])
            tx.finalize()
            if (not txHandler.isValidTx(tx,utxoPool,pks)):
                passes = False
-               print("Failed")
+               #print("TEST NUMBERRRRRRRRRRRRRRRRRR",i,"Failed")
                break
            else:
-               print("Passed")
+               #print("TEST NUMBERRRRRRRRRRRRRRRRRR",i,"Passed HERE")
+               pass
+           #print("\n\n\n")
         self.assertTrue(passes)
 
 
