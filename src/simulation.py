@@ -1,5 +1,8 @@
 
 import random
+from CompliantNode import CompliantNode
+from MaliciousNode import MaliciousNode
+from Transaction_HW3 import Transaction
 
 def main(args):
 ##
@@ -21,7 +24,7 @@ def main(args):
          if(random.random() < p_malicious):
  #           // When you are ready to try testing with malicious nodes, replace the
  #           // instantiation below with an instantiation of a MaliciousNode
-            nodes[i] = MalDoNothing(p_graph, p_malicious, p_txDistribution, numRounds)
+            nodes[i] = MaliciousNode(p_graph, p_malicious, p_txDistribution, numRounds)
          else:
             nodes[i] = CompliantNode(p_graph, p_malicious, p_txDistribution, numRounds)
 
@@ -31,7 +34,7 @@ def main(args):
 
 ##      // initialize a set of 500 valid Transactions with random ids
     numTx = 500
-    validTxIds = {}
+    validTxIds = set()
     for i in range(numTx):
          validTxIds.add(random.randint(1000,50000))
 
@@ -41,6 +44,7 @@ def main(args):
 ##      // the starting state of Transactions each node has heard. The distribution
 ##      // is random with probability p_txDistribution for each Transaction-Node pair.
 
+    pendingTransactions = set()
     for i in range(numNodes):
         for txid in validTxIds:
           if (random.random() < p_txDistribution): #// p_txDistribution is .01, .05, or .10.
@@ -51,8 +55,7 @@ def main(args):
 
     for round in range(numRounds):
 ##         // gather all the proposals into a map. The key is the index of the node receiving
-##         // proposals. The value is an List containing pairs. The first
-##         // element is the id of the transaction being proposed and the second
+##         // proposals. The value is an List containing pairs. The first element is the id of the transaction being proposed and the second
 ##         // element is the index # of the node proposing the transaction.
          allProposals = {}
 
@@ -67,10 +70,10 @@ def main(args):
                        break #continue; // tx only matters if j follows i
 
                    if (j not in allProposals):
-                       candidates = {}
-                       allProposals.put(j, candidates)
-            candidate = Candidate(tx, i)
-            allProposals.get(j).add(candidate)
+                       candidates = set()
+                       allProposals[j] = candidates
+                   candidate = Candidate(tx, i)
+                   allProposals[j].add(candidate)
 
 ##         // Distribute the Proposals to their intended recipients as Candidates
          for i in range(numNodes):
@@ -82,6 +85,21 @@ def main(args):
  #     // print results
     for i in range(numNodes):
          transactions = nodes[i].sendToFollowers()
-         print("Transaction ids that Node " + i + " believes consensus on:")
-         for tx in transactions:
-             print(tx.id, "\n\n")
+         node = nodes[i]
+         if type(node) != MaliciousNode:
+             print("Transaction ids that Node " + str(i) + " believes consensus on:")
+             print(len(list(transactions)))
+
+p_graphs = [0.1, 0.2, 0.3]
+p_mal = [0.15, 0.3, 0.45]
+p_tx = [0.01, 0.05, 0.1]
+n_rounds = [10, 20]
+for g in p_graphs:
+    for m in p_mal:
+        for t in p_tx:
+            for r in n_rounds:
+                main([g,m,t,r])
+                break
+            break
+        break
+    break
