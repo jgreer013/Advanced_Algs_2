@@ -99,7 +99,6 @@ for g in p_graphs:
         for t in p_tx:
             for r in n_rounds:
                 main([g,m,t,r])
-                break
             break
         break
     break
